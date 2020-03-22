@@ -55,9 +55,11 @@
 
     <script>
         (function(){
+            const url = (typeof process!== 'undefined') ? 'https://dnd-diceroom.herokuapp.com' : 'http://localhost:3000'
+            console.log(process.env.NODE_ENV)
             var socket = false; 
             document.querySelector('.connect').addEventListener('click', () => { 
-                socket = io('http://localhost:3000');
+                socket = io(url);
                 var dices = document.querySelectorAll('.dice');
                 const rollDice = (event) => socket.emit('roll', {id: parseInt(document.querySelector('.myId').value), dice: parseInt(event.target.dataset.diceval)})
                 const showValue = (res) => console.log('hello',res)
