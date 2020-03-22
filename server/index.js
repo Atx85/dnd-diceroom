@@ -23,8 +23,8 @@ io.on('connection', (socket) => {
 	})
 
 	socket.on('playerCheckResponse', data => {
-		users.push(data.id)
-		userNames.push(data.name)
+		users.push(data.id);
+		userNames[data.id] = data.name;
 		io.emit('newPlayer',{people: userNames});
 	})
 	
