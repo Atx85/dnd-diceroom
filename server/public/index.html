@@ -78,6 +78,7 @@
                 })
 
                 socket.on('newRoll', (roll) => { 
+                    console.log(roll)
                     let natVal = '';
                     if( roll.value === roll.dice ) natVal = 'nat-val';
                     if( roll.value === 1 ) natVal = 'nat-min';
