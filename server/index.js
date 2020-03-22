@@ -28,7 +28,11 @@ io.on('connection', (socket) => {
 		io.emit('newPlayer',{people: userNames});
 	})
 	
-
+	socket.on('disconnect', () => {
+		io.emit('playerCheck');
+		users = [];
+		userNames = [];		
+	});
 
 	socket.on('roll', (req, res) => {
 		io.emit('newRoll',{all: userNames, id: req.id, name: userNames[req.id], dice: req.dice, value: Math.floor((Math.random()) * Math.floor(req.dice))+1 })
