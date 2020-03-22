@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.css">
+    <style>
+        .nat-val {
+            font-size: 20px;
+            color: green;
+        }
+
+        .nat-min {
+            font-size: 20px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="connect-form mb-5 mt-5">
+            <label for="name">Name: </label>
+            <input type="text" name="" class="name" id="name"> <button class="connect">Connect</button>
+        </div>
+        <h3 class="d-none player-name-container">Welcome <span class="player-name"></span></h3>
+        <input type="hidden" name="myId" class="myId" value="-1" />
+
+        <div class="row mb-4">
+            <button class="dice btn btn-warning mr-1" data-diceval="100">Roll d100</button>
+            <button class="dice btn btn-warning mr-1" data-diceval="20">Roll d20</button>
+            <button class="dice btn btn-warning mr-1" data-diceval="12">Roll d12</button>
+            <button class="dice btn btn-warning mr-1" data-diceval="10">Roll d10</button>
+            <button class="dice btn btn-warning mr-1" data-diceval="8">Roll d8</button>
+            <button class="dice btn btn-warning mr-1" data-diceval="6">Roll d6</button>
+            <button class="dice btn btn-warning mr-1" data-diceval="4">Roll d4</button>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <h4>People:</h4>
+                <ul class="list-group others">
+                  </ul>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-warning mb-3" >
+                    <div class="card-header">Console</div>
+                    <div class="card-body">
+                        <div class="messages" style="height: 50vh; overflow: auto;"></div>
+                  </div>
+            </div>
+        </div>  
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+
+    <script>
+        (function(){
+            var socket = false; 
+            document.querySelector('.connect').addEventListener('click', () => { 
+                socket = io('http://localhost:3000');
+                var dices = document.querySelectorAll('.dice');
+                const rollDice = (event) => socket.emit('roll', {id: parseInt(document.querySelector('.myId').value), dice: parseInt(event.target.dataset.diceval)})
+                const showValue = (res) => console.log('hello',res)
+                var players = [];
+
+                socket.on('introduce', () => {
+                    socket.emit('iam', {name: document.querySelector('.name').value, id: parseInt(document.querySelector('.myId').value)}) 
+                    document.querySelector('.player-name').innerText = document.querySelector('.name').value;
+                    document.querySelector('.player-name-container').className = "mb-5 mt-5";
+                    document.querySelector('.connect-form').remove();
+                })
+
+                socket.on('playerCheck', () => {
+                    socket.emit('playerCheckResponse',{
+                        id: (parseInt(document.querySelector('.myId').value)),
+                        name: (document.querySelector('.player-name').innerText)
+                    });
+                })
+
+                socket.on('newRoll', (roll) => { 
+                    let natVal = '';
+                    if( roll.value === roll.dice ) natVal = 'nat-val';
+                    if( roll.value === 1 ) natVal = 'nat-min';
+                    let sentence = "<b>" +roll.name + "</b> has rolled <b class=\""+ natVal +"\">" + roll.value + "</b> width a D" + roll.dice;
+                    let node = document.createElement('p');
+                    node.innerHTML = sentence;
+                    document.querySelector('.messages').prepend(node);
+                })
+
+                socket.on('newPlayer', (data) => {
+                    document.querySelector('.others').innerHTML = '';
+                    data.people.forEach(el => {
+                            if( el ) {
+                                var node = document.createElement('li');
+                                node.className = 'list-group-item d-flex justify-content-between align-items-center ';
+                                node.appendChild(document.createTextNode(el));
+                                var span = document.createElement('span');
+                                span.className= 'badge badge-primary badge-pill';
+                                node.appendChild(span);
+                                document.querySelector('.others').appendChild(node);
+                                players.push(data.id)
+                            }
+
+                    })
+                })
+
+                socket.on('handshake', (id) => document.querySelector('.myId').value = id.id)
+                dices.forEach( dice => dice.addEventListener('click', rollDice ));          
+            })
+        })(io);
+
+
+
+    </script>
+</body>
+</html>
