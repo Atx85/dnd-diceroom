@@ -51,15 +51,13 @@
         </div>  
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
 
     <script>
         (function(){
-            const url = (typeof process!== 'undefined') ? 'https://dnd-diceroom.herokuapp.com' : 'http://localhost:3000'
-            console.log(process.env.NODE_ENV)
             var socket = false; 
             document.querySelector('.connect').addEventListener('click', () => { 
-                socket = io(url);
+                socket = io();
                 var dices = document.querySelectorAll('.dice');
                 const rollDice = (event) => socket.emit('roll', {id: parseInt(document.querySelector('.myId').value), dice: parseInt(event.target.dataset.diceval)})
                 const showValue = (res) => console.log('hello',res)
