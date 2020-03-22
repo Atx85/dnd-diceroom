@@ -31,7 +31,7 @@ io.on('connection', (socket) => {
 
 
 	socket.on('roll', (req, res) => {
-		io.emit('newRoll',{id: req.id, name: userNames[req.id], dice: req.dice, value: Math.floor((Math.random()) * Math.floor(req.dice))+1 })
+		io.emit('newRoll',{all: userNames, id: req.id, name: userNames[req.id], dice: req.dice, value: Math.floor((Math.random()) * Math.floor(req.dice))+1 })
 	})
 });
 
