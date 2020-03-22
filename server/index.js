@@ -3,8 +3,9 @@ const http = require('http').createServer(app)
 const io = require('socket.io')(http)
 let users = [];
 let userNames = [];
+const port = process.env.PORT || 3000;
 
-app.get('/', (req, res) => res.sendFile(__dirname + '/index.html'))
+app.get('/', (req, res) => res.sendFile(__dirname + '/public/index.html'))
 
 io.on('connection', (socket) => {
 	
@@ -31,11 +32,6 @@ io.on('connection', (socket) => {
 
 	socket.on('roll', (req, res) => {
 		io.emit('newRoll',{id: req.id, name: userNames[req.id], dice: req.dice, value: Math.floor((Math.random()) * Math.floor(req.dice))+1 })
-	})
-	console.log('connected');
-
-	socket.on('disconnect', (data) => {
-		console.log(data);
 	})
 });
 
